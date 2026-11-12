@@ -114,4 +114,25 @@ class ProductController extends Controller
             'message' => 'Product quantity updated successfully.',
         ]);
     }
+
+    public function increaseQuantity(Product $product)
+    {
+        Product::whereKey($product->id)
+            ->increment('quantity', 1, ['updated_at' => now()]);
+
+        return response()->json([
+            'quantity' => $product->fresh()->quantity,
+        ]);
+    }
+
+    public function decreaseQuantityAjax(Product $product)
+    {
+        Product::whereKey($product->id)
+            ->where('quantity', '>', 0)
+            ->decrement('quantity', 1, ['updated_at' => now()]);
+
+        return response()->json([
+            'quantity' => $product->fresh()->quantity,
+        ]);
+    }
 }
