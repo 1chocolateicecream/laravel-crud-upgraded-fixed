@@ -91,6 +91,41 @@ form input[type="submit"]:hover {
     background-color: #555;
 }
 
+.quantity-control {
+    max-width: 360px;
+    margin: 20px 0;
+}
+
+.quantity-control input[type="number"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.quantity-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.quantity-actions button {
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 4px;
+    background: #333;
+    color: #fff;
+    cursor: pointer;
+}
+
+.quantity-actions button:disabled {
+    cursor: wait;
+    opacity: 0.6;
+}
+
 /* Product List */
 .product-list {
     list-style: none;

@@ -85,4 +85,33 @@ class ProductController extends Controller
             ->route('products.show', [$product])
             ->with('error', 'Not enough stock to decrease quantity.');
     }
+
+    public function updateQuantity(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'direction' => ['required', 'in:increase,decrease'],
+            'amount' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $amount = (int) $validated['amount'];
+
+        if ($validated['direction'] === 'increase') {
+            Product::whereKey($product->id)->increment('quantity', $amount, ['updated_at' => now()]);
+        } else {
+            $updated = Product::whereKey($product->id)
+                ->where('quantity', '>=', $amount)
+                ->decrement('quantity', $amount, ['updated_at' => now()]);
+
+            if ($updated === 0) {
+                return response()->json([
+                    'message' => 'Not enough stock to decrease quantity.',
+                ], 422);
+            }
+        }
+
+        return response()->json([
+            'quantity' => $product->fresh()->quantity,
+            'message' => 'Product quantity updated successfully.',
+        ]);
+    }
 }
