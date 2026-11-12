@@ -12,6 +12,7 @@ Route::get('/products/{product}/show', [ProductController::class, 'show'])->name
 Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
 Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+Route::post('/products/{product}/quantity', [ProductController::class, 'updateQuantity'])->name('products.quantity');
 Route::post('/products/{product}/decrease', [ProductController::class, 'decreaseQuantity'])->name('products.decrease');
 Route::post(
     '/products/{product}/increase-quantity',

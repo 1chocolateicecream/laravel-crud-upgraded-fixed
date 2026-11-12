@@ -57,12 +57,7 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('products')->ignore($product->id)
-            ],
+            'name' => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
             'quantity' => ['required', 'integer', 'min:0'],
             'description' => ['required', 'string'],
         ]);
@@ -91,25 +86,53 @@ class ProductController extends Controller
             ->with('error', 'Not enough stock to decrease quantity.');
     }
 
-    public function increaseQuantity(Product $product)
+    public function updateQuantity(Request $request, Product $product)
     {
-        $product->quantity += 1;
-        $product->save();
+        $validated = $request->validate([
+            'direction' => ['required', 'in:increase,decrease'],
+            'amount' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $amount = (int) $validated['amount'];
+
+        if ($validated['direction'] === 'increase') {
+            Product::whereKey($product->id)->increment('quantity', $amount, ['updated_at' => now()]);
+        } else {
+            $updated = Product::whereKey($product->id)
+                ->where('quantity', '>=', $amount)
+                ->decrement('quantity', $amount, ['updated_at' => now()]);
+
+            if ($updated === 0) {
+                return response()->json([
+                    'message' => 'Not enough stock to decrease quantity.',
+                ], 422);
+            }
+        }
 
         return response()->json([
-            'quantity' => $product->quantity
+            'quantity' => $product->fresh()->quantity,
+            'message' => 'Product quantity updated successfully.',
+        ]);
+    }
+
+    public function increaseQuantity(Product $product)
+    {
+        Product::whereKey($product->id)
+            ->increment('quantity', 1, ['updated_at' => now()]);
+
+        return response()->json([
+            'quantity' => $product->fresh()->quantity,
         ]);
     }
 
     public function decreaseQuantityAjax(Product $product)
     {
-        if ($product->quantity > 0) {
-            $product->quantity -= 1;
-            $product->save();
-        }
+        Product::whereKey($product->id)
+            ->where('quantity', '>', 0)
+            ->decrement('quantity', 1, ['updated_at' => now()]);
 
         return response()->json([
-            'quantity' => $product->quantity
+            'quantity' => $product->fresh()->quantity,
         ]);
     }
 }
