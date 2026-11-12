@@ -57,7 +57,12 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('products')->ignore($product->id)],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('products')->ignore($product->id)
+            ],
             'quantity' => ['required', 'integer', 'min:0'],
             'description' => ['required', 'string'],
         ]);
@@ -84,5 +89,27 @@ class ProductController extends Controller
         return redirect()
             ->route('products.show', [$product])
             ->with('error', 'Not enough stock to decrease quantity.');
+    }
+
+    public function increaseQuantity(Product $product)
+    {
+        $product->quantity += 1;
+        $product->save();
+
+        return response()->json([
+            'quantity' => $product->quantity
+        ]);
+    }
+
+    public function decreaseQuantityAjax(Product $product)
+    {
+        if ($product->quantity > 0) {
+            $product->quantity -= 1;
+            $product->save();
+        }
+
+        return response()->json([
+            'quantity' => $product->quantity
+        ]);
     }
 }
