@@ -13,3 +13,12 @@ Route::delete('/products/{product}', [ProductController::class, 'destroy'])->nam
 Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
 Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 Route::post('/products/{product}/decrease', [ProductController::class, 'decreaseQuantity'])->name('products.decrease');
+Route::post(
+    '/products/{product}/increase-quantity',
+    [ProductController::class, 'increaseQuantity']
+)->name('products.increaseQuantity');
+
+Route::post(
+    '/products/{product}/decrease-quantity-ajax',
+    [ProductController::class, 'decreaseQuantityAjax']
+)->name('products.decreaseQuantityAjax');
